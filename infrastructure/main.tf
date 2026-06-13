@@ -86,3 +86,23 @@ output "primary_website_url" {
 output "backup_website_url" {
   value = aws_s3_bucket_website_configuration.backup.website_endpoint
 }
+
+# -------------------------------------------------------------------------
+# UPLOAD HTML FILES TO S3
+# -------------------------------------------------------------------------
+resource "aws_s3_object" "primary_index" {
+  bucket       = aws_s3_bucket.primary.id
+  key          = "index.html"
+  source       = "${path.module}/../src/primary.html"
+  etag         = filemd5("${path.module}/../src/primary.html")
+  content_type = "text/html"
+}
+
+resource "aws_s3_object" "backup_index" {
+  provider     = aws.london
+  bucket       = aws_s3_bucket.backup.id
+  key          = "index.html"
+  source       = "${path.module}/../src/backup.html"
+  etag         = filemd5("${path.module}/../src/backup.html")
+  content_type = "text/html"
+}
