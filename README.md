@@ -28,3 +28,25 @@ Deploy the dual-region buckets, upload the web assets, and establish the Route 5
 cd infrastructure
 terraform init
 terraform apply
+```
+
+**2. Chaos Engineering (Live Fire Disaster Simulation):**
+To verify the automated DR protocol, deliberately simulate a regional outage by destroying the Primary Site's core web asset via the Terraform CLI:
+
+```bash
+terraform destroy -target="aws_s3_object.primary_index"
+```
+
+Wait 60 to 90 seconds. Route 53 will detect the dropped packets, flag the region as Unhealthy, and trigger the CloudWatch Failover Alarm.
+
+### 📸 Chaos Engineering Evidence
+
+*Visual difference between Primary (Green) and Backup (Orange) sites:*
+![Primary Site](./images/irleand-primary.png)
+![Backup Site](./images/london-backup.png)
+
+*Route 53 Health Check flipping to RED/UNHEALTHY & CloudWatch Alarm Triggered:*
+![Primary Unhealthy AWS View](./images/primary-unhealthy-aws.png)
+
+*Failover Result (Traffic rerouted to London Backup Site):*
+![Failover Routing Complete](./images/backup-running-primary-dead.png)
